@@ -219,62 +219,6 @@ export const StockChart = () => {
               );
             })}
           </g>
-
-          {/* Volume label */}
-          <text
-            x={chartPadding.left - 10}
-            y={chartPadding.top + priceChartHeight + 20}
-            fill="#6b7280"
-            fontSize={12}
-            textAnchor="end"
-            dominantBaseline="hanging"
-          >
-            Volume
-          </text>
-
-          {/* Title */}
-          <text
-            x={width / 2}
-            y={30}
-            fill="#ffffff"
-            fontSize={32}
-            fontWeight="bold"
-            textAnchor="middle"
-          >
-            AAPL Stock Performance
-          </text>
-
-          {/* Date range labels */}
-          {visibleData.length > 0 && (
-            <>
-              <text
-                x={chartPadding.left}
-                y={height - 50}
-                fill="#6b7280"
-                fontSize={14}
-                textAnchor="start"
-              >
-                {new Date(visibleData[0].timestamp * 1000).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </text>
-              <text
-                x={chartPadding.left + chartWidth}
-                y={height - 50}
-                fill="#6b7280"
-                fontSize={14}
-                textAnchor="end"
-              >
-                {new Date(visibleData[visibleData.length - 1].timestamp * 1000).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </text>
-            </>
-          )}
         </svg>
       </div>
     </div>
