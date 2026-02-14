@@ -113,6 +113,38 @@ export const StockChart = () => {
     }
   );
 
+  // Title sequence animations
+  const titleDuration = 2 * fps; // Show title for 2 seconds
+  const titleFadeIn = 0.5 * fps;
+  const titleFadeOut = 0.5 * fps;
+
+  const titleOpacity = interpolate(
+    frame,
+    [0, titleFadeIn, titleDuration - titleFadeOut, titleDuration],
+    [0, 1, 1, 0],
+    {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.inOut(Easing.ease),
+    }
+  );
+
+  const titleScale = interpolate(
+    frame,
+    [0, titleFadeIn],
+    [0.8, 1],
+    {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.out(Easing.back(1.5)),
+    }
+  );
+
+  // Calculate the Y position of the first data point for title alignment
+  const firstDataPoint = dataPoints[0];
+  const firstCandleY = yScale((firstDataPoint.open + firstDataPoint.close) / 2);
+  const titleTopPosition = chartPadding.top + firstCandleY;
+
   return (
     <div
       style={{
@@ -130,8 +162,50 @@ export const StockChart = () => {
           transform: `scale(${zoomScale}) rotateY(${rotationY}deg)`,
           transformOrigin: 'center center',
           transformStyle: 'preserve-3d',
+          position: 'relative',
         }}
       >
+        {/* Title Sequence - moves with chart */}
+        {titleOpacity > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: titleTopPosition,
+              left: 0,
+              width: chartPadding.left,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              opacity: titleOpacity,
+              transform: `translate(${panX}px, ${panY}px) translateY(-50%) scale(${titleScale})`,
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 120,
+                fontWeight: 'bold',
+                color: '#ffffff',
+                marginBottom: 20,
+                letterSpacing: '0.05em',
+                textAlign: 'right',
+              }}
+            >
+              AAPL
+            </div>
+            <div
+              style={{
+                fontSize: 32,
+                color: '#9ca3af',
+                fontWeight: '500',
+                textAlign: 'right',
+              }}
+            >
+              Apple Inc. - 6 Month Performance
+            </div>
+          </div>
+        )}
+
         <svg
           width={width}
           height={height}
