@@ -1,3 +1,5 @@
+import { StockChart } from './StockChart';
+
 export const MyComposition = () => {
-  return null;
+  return <StockChart />;
 };
