@@ -62,15 +62,34 @@ export const StockChart = () => {
   const yScale = (price: number) => priceChartHeight - ((price - minPrice) / priceRange) * priceChartHeight;
   const volumeScale = (volume: number) => (volume / maxVolume) * volumeHeight;
 
-  // Pan animation - keep the current (last visible) data point centered horizontally
-  const lastVisibleIndex = Math.max(0, visiblePoints - 1);
-  const lastVisibleX = chartPadding.left + xScale(lastVisibleIndex);
-  const screenCenterX = width / 2;
-  const panX = screenCenterX - lastVisibleX;
-
-  // Zoom animation - start zoomed in, zoom out to normal by midpoint
+  // Animation timing
   const { durationInFrames } = useVideoConfig();
   const midpoint = durationInFrames / 2;
+
+  // Pan animation - start at (880, 200.491), end at (-460, 0)
+  const panX = interpolate(
+    frame,
+    [0, durationInFrames],
+    [880, -460],
+    {
+      extrapolateRight: 'clamp',
+      extrapolateLeft: 'clamp',
+      easing: Easing.inOut(Easing.cubic),
+    }
+  );
+
+  const panY = interpolate(
+    frame,
+    [0, durationInFrames],
+    [200.491, 0],
+    {
+      extrapolateRight: 'clamp',
+      extrapolateLeft: 'clamp',
+      easing: Easing.inOut(Easing.cubic),
+    }
+  );
+
+  // Zoom animation - start zoomed in, zoom out to normal by midpoint
   const zoomScale = interpolate(
     frame,
     [0, midpoint],
@@ -82,20 +101,15 @@ export const StockChart = () => {
     }
   );
 
-  // Calculate vertical offset to center current (last visible) data point when zoomed in
-  const currentDataPoint = visibleData.length > 0 ? visibleData[visibleData.length - 1] : dataPoints[0];
-  const currentCandleY = chartPadding.top + yScale(currentDataPoint.close);
-  const viewportCenterY = height / 2;
-  const centeringOffsetY = viewportCenterY - currentCandleY;
-  
-  // Pan Y - centers current candlestick when zoomed, fades out as we zoom out
-  const panY = frame < midpoint ? centeringOffsetY : interpolate(
+  // Rotation animation - rotate around Y axis (vertical) as animation progresses
+  const rotationY = interpolate(
     frame,
-    [midpoint, midpoint + 30],
-    [centeringOffsetY, 0],
+    [0, durationInFrames],
+    [-20, -40],
     {
       extrapolateRight: 'clamp',
       extrapolateLeft: 'clamp',
+      easing: Easing.inOut(Easing.cubic),
     }
   );
 
@@ -108,12 +122,14 @@ export const StockChart = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        perspective: '2000px',
       }}
     >
       <div
         style={{
-          transform: `scale(${zoomScale})`,
+          transform: `scale(${zoomScale}) rotateY(${rotationY}deg)`,
           transformOrigin: 'center center',
+          transformStyle: 'preserve-3d',
         }}
       >
         <svg
