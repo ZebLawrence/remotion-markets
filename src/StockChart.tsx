@@ -1,5 +1,4 @@
 import { useCurrentFrame, useVideoConfig, interpolate, Easing } from 'remotion';
-import stockData from './data/aapl_6m.json';
 
 interface StockDataPoint {
   timestamp: number;
@@ -10,7 +9,22 @@ interface StockDataPoint {
   volume: number;
 }
 
-export const StockChart = () => {
+interface StockChartProps {
+  symbol: string;
+  description: string;
+  stockData: {
+    t: number[];
+    o: number[];
+    h: number[];
+    l: number[];
+    c: number[];
+    v: number[];
+  };
+  transitionTranslateX?: number;
+  transitionOpacity?: number;
+}
+
+export const StockChart = ({ symbol, description, stockData, transitionTranslateX = 0, transitionOpacity = 1 }: StockChartProps) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
@@ -155,6 +169,8 @@ export const StockChart = () => {
         alignItems: 'center',
         justifyContent: 'center',
         perspective: '2000px',
+        transform: `translateX(${transitionTranslateX}px)`,
+        opacity: transitionOpacity,
       }}
     >
       <div
@@ -191,7 +207,7 @@ export const StockChart = () => {
                 textAlign: 'right',
               }}
             >
-              AAPL
+              {symbol}
             </div>
             <div
               style={{
@@ -201,7 +217,7 @@ export const StockChart = () => {
                 textAlign: 'right',
               }}
             >
-              Apple Inc. - 6 Month Performance
+              {description}
             </div>
           </div>
         )}
